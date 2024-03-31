@@ -17,6 +17,8 @@ export default function App() {
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   
+
+  // This is a test commit
   return (
 
     <View style={styles.container}>
