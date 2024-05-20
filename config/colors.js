@@ -6,5 +6,8 @@ export default {
     light: "#4D4F52",
     white: "#fff",
     "white-smoke": "#b5b5b5",
+    Tawny:'#7E481C',
+    Gingerbread: '#5C2C06',
+    Tortilla: '#997950',
   };
   
