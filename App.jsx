@@ -18,7 +18,7 @@ import PaymentScreen from './screens/paymentScreen';
 SplashScreen.preventAutoHideAsync();
 const loadFonts = () => {
   return Font.loadAsync({
-    'Montserrat-Italic-VariableFont_wght': require('./assets/fonts/Montserrat/Montserrat-Italic-VariableFont_wght.ttf'),
+    'CedarvilleCursive-Regular': require('./assets/fonts/CedarvilleCursive-Regular.ttf'),
   });
 };
 
