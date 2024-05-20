@@ -7,6 +7,7 @@ import {
   Image,
   StyleSheet,
   Dimensions,
+  ImageBackground,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BlurView } from "expo-blur";
@@ -40,6 +41,7 @@ const HomeScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView style={{ padding: SPACING }}>
+        <ImageBackground source ={require("../assets/images/hom.jpg")}>
         <View style={styles.topContainer}>
           <View
             style={{
@@ -122,7 +124,7 @@ const HomeScreen = ({ navigation }) => {
                 overflow: "hidden",
               }}
             >
-              <BlurView tint="dark" intensity={95} style={{ padding: SPACING, backgroundColor: 'rgba(196, 164, 132,0.6)' }}>
+              <View tint="dark" intensity={95} style={{ padding: SPACING, backgroundColor: 'rgba(196, 164, 132, 0.6)', }}>
                 <TouchableOpacity
                   style={{ height: 150, width: "100%" }}
                   onPress={() =>
@@ -221,10 +223,11 @@ const HomeScreen = ({ navigation }) => {
                     />
                   </TouchableOpacity>
                 </View>
-              </BlurView>
+              </View>
             </View>
           ))}
         </View>
+        </ImageBackground>
       </ScrollView>
     </SafeAreaView>
   );

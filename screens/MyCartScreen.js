@@ -1,23 +1,23 @@
 import React from 'react';
-import { FlatList, StyleSheet, Text, View, Image, SafeAreaView,PrimaryButton,Navigation } from
-'react-native';
+import { FlatList, StyleSheet, Text, View, Image, ImageBackground, SafeAreaView, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import PropTypes from 'prop-types'; 
+import PropTypes from 'prop-types';
 import COLORS from '../config/colors';
-import coffee from '../config/coffees'; 
+import coffees from '../config/coffees';
+import PrimaryButton from '../components/PrimaryButton';
 
-const MyCartScreen = () => {
+const MyCartScreen = ({ navigation }) => {
   const CartCard = ({ item }) => {
     return (
       <View style={styles.cartCard}>
         <Image source={item.image} style={{ height: 80, width: 80 }} />
         <View style={{ height: 100, marginLeft: 10, paddingVertical: 20, flex: 1 }}>
-          <Text style={{ fontWeight: 'bold', fontSize: 16, color: COLORS.white }}>{item.name}</Text>
-          <Text style={{ fontSize: 13, color: COLORS.white }}>{item.ingredients}</Text>
-          <Text style={{ fontSize: 17, fontWeight: 'bold', color: COLORS.white }}>${item.price}</Text>
+          <Text style={{ fontWeight: 'bold', fontSize: 16, color: COLORS.brown }}>{item.name}</Text>
+          <Text style={{ fontSize: 13, color: COLORS.brown}}>{item.included}</Text>
+          <Text style={{ fontSize: 17, fontWeight: 'bold', color: COLORS.brown }}>${item.price}</Text>
         </View>
         <View style={{ marginRight: 20, alignItems: 'center' }}>
-          <Text style={{ fontWeight: 'bold', fontSize: 18, color: COLORS.white }}>3</Text>
+          <Text style={{ fontWeight: 'bold', fontSize: 18, color: COLORS.brown }}>3</Text>
           <View style={styles.actionBtn}>
             <Icon name="remove" size={25} color={COLORS.Gingerbread} />
             <Icon name="add" size={25} color={COLORS.Gingerbread} />
@@ -27,43 +27,43 @@ const MyCartScreen = () => {
     );
   };
 
-  
   CartCard.propTypes = {
     item: PropTypes.shape({
-      id: PropTypes.string.isRequired,
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
       name: PropTypes.string.isRequired,
-      ingredients: PropTypes.string.isRequired,
+      included: PropTypes.string.isRequired,
       price: PropTypes.string.isRequired,
-      image: PropTypes.any.isRequired,
+      image: PropTypes.oneOfType([PropTypes.object, PropTypes.number]).isRequired,
     }).isRequired,
   };
 
   return (
-    <SafeAreaView style={{ backgroundColor: COLORS.white, flex: 1 }}>
-      <View style={styles.header}>
-        <Icon name="arrow-back-ios" size={28} onPress={() => Navigation.goBack()} />
-        <Text style={{ fontSize: 20, fontWeight: 'bold', color: COLORS.Tawny }}>My Cart</Text>
-      </View>
-      <FlatList
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 80 }}
-        data={coffee} 
-        renderItem={({ item }) => <CartCard item={item} />}
-        ListFooterComponentStyle={{ paddingHorizontal: 20, marginTop: 20 }}
-        ListFooterComponent={() => (
-          <View>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: 15 }}>
-              <Text style={{ fontSize: 18, fontWeight: 'bold', color: COLORS.Tawny }}>Total Price</Text>
-              <Text style={{ fontSize: 18, fontWeight: 'bold', color: COLORS.Tawny }}>$50</Text>
+    //<ImageBackground source={require("../assets/images/cart.jpg")} style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={styles.header}>
+          <Icon name="arrow-back-ios" size={28} onPress={() => navigation.goBack()} />
+          <Text style={{ fontSize: 20, fontWeight: 'bold', color: COLORS.Tawny }}>My Cart</Text>
+        </View>
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 80 }}
+          data={coffees}
+          renderItem={({ item }) => <CartCard item={item} />}
+          ListFooterComponentStyle={{ paddingHorizontal: 20, marginTop: 20 }}
+          ListFooterComponent={() => (
+            <View>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: 15 }}>
+                <Text style={{ fontSize: 18, fontWeight: 'bold', color: COLORS.Tawny }}>Total Price</Text>
+                <Text style={{ fontSize: 18, fontWeight: 'bold', color: COLORS.Tawny }}>$50</Text>
+              </View>
+              <View style={{ marginHorizontal: 30 }}>
+                <PrimaryButton title="CHECKOUT" onPress={() => navigation.navigate('payment')} />
+              </View>
             </View>
-            <View style={{ marginHorizontal: 30 }}>
-              
-              <PrimaryButton title="CHECKOUT" />
-            </View>
-          </View>
-        )}
-      />
-    </SafeAreaView>
+          )}
+        />
+      </SafeAreaView>
+  //  </ImageBackground>
   );
 };
 
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: 10, 
+    marginHorizontal: 10,
   },
   cartCard: {
     height: 100,
@@ -94,6 +94,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  imageBackground: {
+    flex: 1,
   },
 });
 

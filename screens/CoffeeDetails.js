@@ -96,7 +96,7 @@ import {
                     <Text
                       style={{
                         fontSize: SPACING * 2,
-                        color: colors.white,
+                        color: colors.black,
                         fontWeight: "600",
                         marginBottom: SPACING,
                       }}
@@ -106,7 +106,7 @@ import {
                     <Text
                       style={{
                         fontSize: SPACING * 1.8,
-                        color: colors["white-smoke"],
+                        color: colors["black"],
                         fontWeight: "500",
                         marginBottom: SPACING,
                       }}
@@ -121,7 +121,7 @@ import {
                       />
                       <Text
                         style={{
-                          color: colors.white,
+                          color: colors.black,
                           marginLeft: SPACING,
                         }}
                       >

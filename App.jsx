@@ -5,6 +5,7 @@ import { useEffect,useState } from 'react';
 import { View, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NativeBaseProvider } from 'native-base';
 import HomeScreen from './screens/HomeScreen';
 import WelcomeScreen from './screens/WelcomeScreen'
 //import { AppRegistry } from 'react-native';
@@ -12,11 +13,12 @@ import CoffeeDetailsScreen from './screens/CoffeeDetails';
 import * as Font from 'expo-font';
 import  * as SplashScreen from 'expo-splash-screen';
 import MyCartScreen from './screens/MyCartScreen';
+import PaymentScreen from './screens/paymentScreen';
 
 SplashScreen.preventAutoHideAsync();
 const loadFonts = () => {
   return Font.loadAsync({
-    'CedarvilleCursive-Regular': require('./assets/fonts/CedarvilleCursive-Regular.ttf'),
+    'Montserrat-Italic-VariableFont_wght': require('./assets/fonts/Montserrat/Montserrat-Italic-VariableFont_wght.ttf'),
   });
 };
 
@@ -46,8 +48,13 @@ function App() {
     return null;
   }
   return (
+    <NativeBaseProvider>
     <NavigationContainer>
       <Stack.Navigator initialRouteName='Welcome'>
+      <Stack.Screen name="payment" component={PaymentScreen} options={{
+          headerShown: false,
+
+        }}/>
       <Stack.Screen name="MyCart" component={MyCartScreen} options={{
           headerShown: false,
 
@@ -66,6 +73,7 @@ function App() {
         
       </Stack.Navigator>
     </NavigationContainer>
+    </NativeBaseProvider>
   );
 }
 
