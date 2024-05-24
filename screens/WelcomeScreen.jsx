@@ -1,13 +1,19 @@
-import { View, Text,ImageBackground } from 'react-native'
-import React from 'react'
-import { TouchableOpacity } from 'react-native'
+import { View, Text,ImageBackground } from 'react-native';
+import React from 'react';
+import { TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import COLORS from '../config/colors';
+import bgimage from "../assets/images/BG1.jpg";
 
 
 
-const WelcomeScreen = ({navigation}) => {
+
+const WelcomeScreen = () => {
+  const navigation = useNavigation();
+
   
     return (
-    <ImageBackground source={require("../assets/images/bg.png")}
+    <ImageBackground source={bgimage}
     style={{
       width: "100%",
       height: "100%",
@@ -38,7 +44,7 @@ const WelcomeScreen = ({navigation}) => {
       }}>
       <Text 
            style={{
-          color: "white",
+          color: COLORS.Gingerbread,
           fontSize: 35,
           fontWeight: "bold",
           textAlign:"center",
@@ -48,9 +54,11 @@ const WelcomeScreen = ({navigation}) => {
        Brewhub: Your cozy coffee hug!{" "}
       </Text>
       <Text style={{
-          color: "white",
-          fontSize: 15,
+          color: COLORS.Gingerbread,
+          fontSize: 18,
+          fontWeight:"bold",
           textAlign:"center",
+          paddingBottom:40,
           
         }}
       >

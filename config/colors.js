@@ -9,5 +9,7 @@ export default {
     Tawny:'#7E481C',
     Gingerbread: '#5C2C06',
     Tortilla: '#997950',
+    brown: '#C4A484',
+    beige: '#F5F5DC'
   };
   

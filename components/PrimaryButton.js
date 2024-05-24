@@ -18,7 +18,7 @@ PrimaryButton.propTypes = {
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.Gingerbread,
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,

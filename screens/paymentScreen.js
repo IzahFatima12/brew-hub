@@ -3,26 +3,25 @@ import { Box, Center, ScrollView, Text, VStack, HStack, Spacer, Image } from "na
 import COLORS from '../config/colors'; 
 import PrimaryButton from "../components/PrimaryButton"; 
 import { Ionicons } from "@expo/vector-icons";
-import { FontAwesome } from "@expo/vector-icons";
 import paypalimage from '../assets/images/paypal.jpg';
 import discoverimage from '../assets/images/discover.png';
 import googlePayimage from '../assets/images/googlepay.png';
 
 const paymentMethods = [
   {
-    
+    image: paypalimage,
     alt: "paypal",
     icon: Ionicons,
   },
   {
     image: discoverimage,
     alt: "discover",
-    icon: FontAwesome, 
+    icon: Ionicons, 
   },
   {
     image: googlePayimage,
     alt: "googlepay",
-    icon: FontAwesome, 
+    icon: Ionicons, 
   },
 ];
 
@@ -34,14 +33,14 @@ function PaymentScreen() {
           PAYMENT METHOD
         </Text>
       </Center>
-      <Box h="full" bg={COLORS.Tawny} px={5}>
+      <Box h="full" bg={COLORS.brown} px={5}>
         <ScrollView showsVerticalScrollIndicator={false}>
           <VStack space={6} mt={5}>
             {paymentMethods.map((i, index) => (
               <HStack
                 key={index}
                 alignItems="center"
-                bg={COLORS.white}
+                bg={COLORS.Gingerbread}
                 px={3}
                 py={1}
                 justifyContent="space-between"
@@ -60,13 +59,13 @@ function PaymentScreen() {
                 <i.icon
                   name="checkmark-circle"
                   size={30}
-                  color={COLORS.Gingerbread}
+                  color={COLORS.Tawny}
                 />
               </HStack>
             ))}
-            <PrimaryButton title="Continue" style={{ backgroundColor: COLORS.Tawny, marginTop: 20 }} />
-            <Text italic textAlign="center" color={COLORS.white}>
-              Payment method is<Text bold color={COLORS.white}> Paypal</Text> by default
+            <PrimaryButton title="Continue" style={{ backgroundColor: COLORS.Gingerbread, marginTop: 20 }} />
+            <Text italic textAlign="center" color={COLORS.Gingerbread}>
+              Payment method is<Text bold color={COLORS.Gingerbread}> Paypal</Text> by default
             </Text>
           </VStack>
         </ScrollView>

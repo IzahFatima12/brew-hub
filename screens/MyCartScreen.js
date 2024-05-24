@@ -5,9 +5,13 @@ import PropTypes from 'prop-types';
 import COLORS from '../config/colors';
 import coffees from '../config/coffees';
 import PrimaryButton from '../components/PrimaryButton';
+import { useNavigation } from '@react-navigation/native';
 
 
-const MyCartScreen = ({ navigation }) => {
+
+
+const MyCartScreen = () => {
+   const navigation=useNavigation();
   const CartCard = ({ item }) => {
     return (
       <View style={styles.cartCard}>
@@ -40,10 +44,11 @@ const MyCartScreen = ({ navigation }) => {
 
   return (
     //<ImageBackground source={require("../assets/images/cart.jpg")} style={{ flex: 1 }}>
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor:COLORS.brown }}>
         <View style={styles.header}>
-          <Icon name="arrow-back-ios" size={28} onPress={() => navigation.goBack()} />
-          <Text style={{ fontSize: 20, fontWeight: 'bold', color: COLORS.white,fontFamily:'CedarvilleCursive',}}>My Cart</Text>
+          <Icon 
+          name="arrow-back-ios" size={28} onPress={() => navigation.goBack()} />
+          <Text style={{ fontSize: 20, fontWeight: 'bold', color: COLORS.white,paddingTop:20,paddingLeft:90,fontstyle:'cursive'}}>My Cart</Text>
         </View>
         <FlatList
           showsVerticalScrollIndicator={false}
@@ -58,7 +63,7 @@ const MyCartScreen = ({ navigation }) => {
                 <Text style={{ fontSize: 18, fontWeight: 'bold', color: COLORS.Gingerbread }}>$50</Text>
               </View>
               <View style={{ marginHorizontal: 30 }}>
-                <PrimaryButton title="CHECKOUT" onPress={() => navigation.navigate('payment')} style={ styles.button } />
+                <PrimaryButton title="CHECKOUT" onPress={() => navigation.navigate('payment')} />
               </View>
             </View>
           )}

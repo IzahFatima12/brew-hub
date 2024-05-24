@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,34 +7,85 @@ import {
   Image,
   StyleSheet,
   Dimensions,
-  ImageBackground,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import SPACING from "../config/SPACING";
 import colors from "../config/colors";
+import Categories from '../components/Categories'; 
 import SearchField from "../components/SearchField";
-import Categories from "../components/Categories";
-import coffees from "../config/coffees";
+import { useNavigation } from '@react-navigation/native';
+import avatarimage from "../assets/avatar.jpg";
+import banner from "../assets/images/Banner.png";
+import { database } from "../config/firebase";  // Correct import path
+import { ref, onValue } from "firebase/database";
+import cappuccinoimg from '../assets/images/cappuccino.jpg';
 
-const avatar = require("../assets/avatar.jpg");
+const avatar = avatarimage;
 const { width } = Dimensions.get("window");
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = () => {
+  const navigation = useNavigation();
+
   const [activeCategoryId, setActiveCategoryId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [coffees, setCoffees] = useState([]);
 
   const handleCategoryChange = (id) => {
     setActiveCategoryId(id);
   };
 
+  useEffect(() => {
+    const dbRefCategories = ref(database, "categories");
+    const dbRefCoffees = ref(database, "coffees");
+  
+    const unsubscribeCategories = onValue(dbRefCategories, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const categoriesArray = Object.keys(data).map((key) => ({
+          id: key, // Assuming 'key' is the unique identifier for each category
+          img: data[key].img,
+          categoryID: data[key].categoryID,
+          title: data[key].title,
+          price: data[key].price,
+          rating: data[key].rating,
+        }))
+        .filter((category) => category.categoryID === activeCategoryId); 
+        setCategories(categoriesArray);
+      }
+    });
+    const unsubscribeCoffees = onValue(dbRefCoffees, (snapshot) => {
+      const data = snapshot.val(); 
+      if (data) {
+        const coffeesArray = Object.keys(data).map((key) => ({
+          id: key, // Assuming 'key' is the unique identifier for each coffee
+          img: data[key].img,
+          title: data[key].title,
+          ingredients: data[key].ingredients,
+          price: data[key].price,
+          rating: data[key].rating,
+        }));
+        setCoffees(coffeesArray);
+        console.log("Fetched coffees",coffeesArray);
+      }
+    });
+  
+    // Clean up the subscriptions
+    return () => {
+      unsubscribeCategories();
+      unsubscribeCoffees();
+    };
+  },[]);  
+  
   const filteredCoffees = coffees.filter((coffee) => {
     const matchesCategory =
       activeCategoryId === null || coffee.categoryId === activeCategoryId;
-    const matchesSearch = coffee.name
+    const matchesSearch = coffee.title
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
+  
   });
 
   return (
@@ -105,7 +156,7 @@ const HomeScreen = ({ navigation }) => {
                   color: colors.white,
                   fontSize: 30,
                   fontWeight: "bold",
-                  fontFamily:'CedarvilleCursive-Regular',
+                  fontFamily: "CedarvilleCursive-Regular",
                   textAlign: "center",
                 }}
               >
@@ -119,9 +170,9 @@ const HomeScreen = ({ navigation }) => {
           </View>
           <Image
             style={{ alignSelf: "center" }}
-            source={require("../assets/images/Banner.png")}
+            source={banner}
           />
-          <Categories onChange={handleCategoryChange} />
+          <Categories categories={categories} onChange={handleCategoryChange} />
           <View
             style={{
               flexDirection: "row",
@@ -139,7 +190,7 @@ const HomeScreen = ({ navigation }) => {
                     }
                   >
                     <Image
-                      source={coffee.image}
+                          source={coffee.img ? { uri: coffee.img } : cappuccinoimg}// Ensure the image source is a URI
                       style={{
                         width: "100%",
                         height: "100%",
@@ -166,10 +217,10 @@ const HomeScreen = ({ navigation }) => {
                     </View>
                   </TouchableOpacity>
                   <Text numberOfLines={2} style={styles.coffeeName}>
-                    {coffee.name}
+                    {coffee.title}
                   </Text>
                   <Text numberOfLines={1} style={styles.coffeeIncluded}>
-                    {coffee.included}
+                    {coffee.ingredients}
                   </Text>
                   <View style={styles.priceContainer}>
                     <View style={{ flexDirection: "row" }}>
@@ -198,7 +249,7 @@ export default HomeScreen;
 
 const styles = StyleSheet.create({
   topContainer: {
-    backgroundColor: "#6F4E37", // Light brown color
+    backgroundColor: "#6F4E37",
     padding: SPACING,
     borderRadius: SPACING,
   },
@@ -228,7 +279,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING / 2,
   },
   coffeeIncluded: {
-    color: colors.secondary,
+    color: colors.black,
     fontSize: SPACING * 1.2,
   },
   priceContainer: {

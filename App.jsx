@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useEffect,useState } from 'react';
-import { View, Text } from 'react-native';
+//import { View, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NativeBaseProvider } from 'native-base';
@@ -14,11 +14,13 @@ import * as Font from 'expo-font';
 import  * as SplashScreen from 'expo-splash-screen';
 import MyCartScreen from './screens/MyCartScreen';
 import PaymentScreen from './screens/paymentScreen';
+import CR from './assets/fonts/CedarvilleCursive-Regular.ttf';
+
 
 SplashScreen.preventAutoHideAsync();
 const loadFonts = () => {
   return Font.loadAsync({
-    'CedarvilleCursive-Regular': require('./assets/fonts/CedarvilleCursive-Regular.ttf'),
+    'CedarvilleCursive-Regular': CR,
   });
 };
 
