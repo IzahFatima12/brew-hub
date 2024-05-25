@@ -12,13 +12,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import SPACING from "../config/SPACING";
 import colors from "../config/colors";
-import Categories from '../components/Categories'; 
 import SearchField from "../components/SearchField";
+import Categories from "../components/Categories";
 import { useNavigation } from '@react-navigation/native';
 import avatarimage from "../assets/avatar.jpg";
 import banner from "../assets/images/Banner.png";
 import { database } from "../config/firebase";  // Correct import path
-import { ref, onValue } from "firebase/database";
+import { ref, onValue, orderByChild,equalTo } from "firebase/database";
 import cappuccinoimg from '../assets/images/cappuccino.jpg';
 
 const avatar = avatarimage;
@@ -30,32 +30,26 @@ const HomeScreen = () => {
   const [activeCategoryId, setActiveCategoryId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [categories, setCategories] = useState([]);
-  const [coffees, setCoffees] = useState([]);
+ const [coffees, setCoffees] = useState([]);
 
-  const handleCategoryChange = (id) => {
-    setActiveCategoryId(id);
+  const handleCategoryChange = (category) => {
+    setActiveCategoryId(category);
   };
 
   useEffect(() => {
-    const dbRefCategories = ref(database, "categories");
     const dbRefCoffees = ref(database, "coffees");
+    let queryRef;
+
+    if (activeCategoryId) {
+      // Construct the query to fetch data for the selected category
+      queryRef = orderByChild(ref(dbRefCoffees, "category")).equalTo(activeCategoryId);
+    } else {
+      queryRef = dbRefCoffees;
+    }
   
-    const unsubscribeCategories = onValue(dbRefCategories, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        const categoriesArray = Object.keys(data).map((key) => ({
-          id: key, // Assuming 'key' is the unique identifier for each category
-          img: data[key].img,
-          categoryID: data[key].categoryID,
-          title: data[key].title,
-          price: data[key].price,
-          rating: data[key].rating,
-        }))
-        .filter((category) => category.categoryID === activeCategoryId); 
-        setCategories(categoriesArray);
-      }
-    });
-    const unsubscribeCoffees = onValue(dbRefCoffees, (snapshot) => {
+    
+  
+    const unsubscribeCoffees = onValue(queryRef, (snapshot) => {
       const data = snapshot.val(); 
       if (data) {
         const coffeesArray = Object.keys(data).map((key) => ({
@@ -73,14 +67,14 @@ const HomeScreen = () => {
   
     // Clean up the subscriptions
     return () => {
-      unsubscribeCategories();
+    
       unsubscribeCoffees();
     };
-  },[]);  
+  },[activeCategoryId]);  
   
   const filteredCoffees = coffees.filter((coffee) => {
     const matchesCategory =
-      activeCategoryId === null || coffee.categoryId === activeCategoryId;
+      activeCategoryId === null || coffee.category === activeCategoryId;
     const matchesSearch = coffee.title
       .toLowerCase()
       .includes(searchQuery.toLowerCase());

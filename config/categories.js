@@ -2,16 +2,16 @@
 const categories = [
   {
     id: 1,
-    name: "Cappuccino",
+    name: "Espresso-based",
   },
   {
     id: 2,
-    name: "Espresso",
+    name: "Speciality Coffees",
   },
-  { id: 3, name: "Latte" },
+  { id: 3, name: "Cold Brew" },
   {
     id: 4,
-    name: "Flat White",
+    name: "Signature coffees",
   },
 ];
 
