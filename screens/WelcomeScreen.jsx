@@ -64,7 +64,7 @@ const WelcomeScreen = () => {
       >
         Every sip unlocks a new memory.
       </Text>
-      <TouchableOpacity onPress={()=>{navigation.navigate("Home")}}>
+      <TouchableOpacity onPress={()=>{navigation.navigate("Login")}}>
       <View style ={{
         width:300,
         height:40,

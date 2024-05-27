@@ -7,6 +7,7 @@ import {
   Image,
   StyleSheet,
   Dimensions,
+  ImageBackground,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -73,6 +74,9 @@ const HomeScreen = () => {
   });
 
   return (
+    
+
+    
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView
         contentContainerStyle={{

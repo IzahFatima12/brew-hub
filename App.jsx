@@ -15,6 +15,7 @@ import  * as SplashScreen from 'expo-splash-screen';
 import MyCartScreen from './screens/MyCartScreen';
 import PaymentScreen from './screens/paymentScreen';
 import CR from './assets/fonts/CedarvilleCursive-Regular.ttf';
+import LoginScreen from './screens/LoginScreen';
 
 
 SplashScreen.preventAutoHideAsync();
@@ -57,6 +58,11 @@ function App() {
           headerShown: false,
 
         }}/>
+
+<Stack.Screen name="Login" component={LoginScreen} options={{
+          headerShown: false,
+
+        }}/>
       <Stack.Screen name="MyCart" component={MyCartScreen} options={{
           headerShown: false,
 
@@ -68,6 +74,7 @@ function App() {
         <Stack.Screen name="Home" component={HomeScreen} options={{
           headerShown: false,
          }} />
+         
          <Stack.Screen name="Welcome" component={WelcomeScreen} options={{
           headerShown: false,
          }} />
