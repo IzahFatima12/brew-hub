@@ -1,90 +1,290 @@
-import React from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  Dimensions,
+  ImageBackground,
+  FlatList,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import SPACING from "../config/SPACING";
+import colors from "../config/colors";
+import { database } from "../config/firebase";
+import { ref, onValue } from "firebase/database";
+import { BlurView } from "expo-blur";
 
-interface CoffeeDetailsProps {
-  route: {
-    params: {
-      coffee: {
-        img: string;
-        title: string;
-        price: number;
-        description: string;
-        ingredients: string;
-        rating: number;
-      };
-    };
-  };
-  navigation: any;
-}
+const { height, width } = Dimensions.get("window");
 
-const CoffeeDetails: React.FC<CoffeeDetailsProps> = ({ route, navigation }) => {
+const CoffeeDetails = ({ route, navigation }) => {
   const { coffee } = route.params;
+  const [recommendedCoffees, setRecommendedCoffees] = useState([]);
+
+  useEffect(() => {
+    const dbRefCoffees = ref(database, "coffees");
+    onValue(dbRefCoffees, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const coffeesArray = Object.keys(data)
+          .map((key) => ({
+            id: key,
+            ...data[key],
+          }))
+          .filter((item) => item.id !== coffee.id); // Exclude current coffee
+        setRecommendedCoffees(coffeesArray);
+      }
+    });
+  }, [coffee.id]);
 
   const handleBuyNow = () => {
-    // Navigate to the cart screen
     navigation.navigate("MyCart");
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <Image source={{ uri: coffee.img }} style={styles.image} />
-      <Text style={styles.title}>{coffee.title}</Text>
-      <Text style={styles.price}>Price: ${coffee.price}</Text>
-      <Text style={styles.description}>{coffee.description}</Text>
-      <Text style={styles.ingredients}>Ingredients: {coffee.ingredients}</Text>
-      <Text style={styles.rating}>Rating: {coffee.rating}</Text>
-
-      {/* Buy Now button */}
-      <TouchableOpacity style={styles.buyNowButton} onPress={handleBuyNow}>
-        <Text style={styles.buyNowText}>Buy Now</Text>
-      </TouchableOpacity>
+      <ScrollView>
+        <ImageBackground
+          source={{ uri: coffee.img }}
+          style={styles.imageBackground}
+          imageStyle={styles.imageBackgroundImage}
+        >
+          <View style={styles.headerButtons}>
+            <TouchableOpacity
+              style={styles.headerButton}
+              onPress={() => navigation.goBack()}
+            >
+              <Ionicons name="arrow-back" color={colors.light} size={SPACING * 2} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.headerButton}>
+              <Ionicons name="heart" color={colors.light} size={SPACING * 2} />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.blurViewContainer}>
+            <BlurView intensity={80} tint="dark" style={styles.blurView}>
+              <View>
+                <Text style={styles.coffeeTitle}>{coffee.title}</Text>
+                <Text style={styles.coffeeIngredients}>{coffee.ingredients}</Text>
+                <View style={styles.ratingContainer}>
+                  <Ionicons name="star" size={SPACING * 1.5} color={colors.primary} />
+                  <Text style={styles.ratingText}>{coffee.rating}</Text>
+                </View>
+              </View>
+              <View style={styles.iconContainer}>
+                <View style={styles.iconWrapper}>
+                  <Ionicons name="cafe" size={SPACING * 2} color={colors.primary} />
+                  <Text style={styles.iconText}>Coffee</Text>
+                </View>
+                <View style={styles.iconWrapper}>
+                  <Ionicons name="water" size={SPACING * 2} color={colors.primary} />
+                  <Text style={styles.iconText}>Milk</Text>
+                </View>
+                <View style={styles.roastTypeWrapper}>
+                  <Text style={styles.roastTypeText}>Medium roasted</Text>
+                </View>
+              </View>
+            </BlurView>
+          </View>
+        </ImageBackground>
+        <View style={styles.detailsContainer}>
+        
+          <Text style={styles.sectionTitle}>You may also like</Text>
+          <FlatList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            data={recommendedCoffees}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <View style={styles.recommendationCard}>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("CoffeeDetails", { coffee: item })}
+                >
+                  <ImageBackground
+                    source={{ uri: item.img }}
+                    style={styles.recommendationImage}
+                    imageStyle={styles.recommendationImageStyle}
+                  >
+                    <BlurView intensity={30} tint="dark" style={styles.recommendationBlur}>
+                      <Text style={styles.recommendationText}>{item.title}</Text>
+                    </BlurView>
+                  </ImageBackground>
+                </TouchableOpacity>
+              </View>
+            )}
+          />
+        </View>
+      </ScrollView>
+      <SafeAreaView style={styles.footer}>
+        <View style={styles.priceContainer}>
+          <Text style={styles.priceLabel}>Price</Text>
+          <View style={styles.priceValueContainer}>
+            <Text style={styles.priceCurrency}>$</Text>
+            <Text style={styles.priceValue}>{coffee.price}</Text>
+          </View>
+        </View>
+        <TouchableOpacity style={styles.buyNowButton} onPress={handleBuyNow}>
+          <Text style={styles.buyNowButtonText}>Buy Now</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
     flex: 1,
+    backgroundColor: "#C4A484",
+  },
+  imageBackground: {
+    height: height / 2 + SPACING * 2,
+    justifyContent: "space-between",
+  },
+  imageBackgroundImage: {
+    borderRadius: SPACING * 3,
+  },
+  headerButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: SPACING * 2,
+  },
+  headerButton: {
+    backgroundColor: colors.dark,
+    padding: SPACING,
+    borderRadius: SPACING * 1.5,
+  },
+  blurViewContainer: {
+    borderRadius: SPACING * 3,
+    overflow: "hidden",
+  },
+  blurView: {
+    padding: SPACING * 2,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  coffeeTitle: {
+    fontSize: SPACING * 2,
+    color: colors.black,
+    fontWeight: "600",
+    marginBottom: SPACING,
+  },
+  coffeeIngredients: {
+    fontSize: SPACING * 1.8,
+    color: colors.black,
+    fontWeight: "500",
+    marginBottom: SPACING,
+  },
+  ratingContainer: {
+    flexDirection: "row",
+    marginTop: SPACING,
+  },
+  ratingText: {
+    color: colors.black,
+    marginLeft: SPACING,
+  },
+  iconContainer: {
+    width: "35%",
+    justifyContent: "space-between",
+  },
+  iconWrapper: {
+    padding: SPACING / 2,
+    width: SPACING * 5,
+    height: SPACING * 5,
+    backgroundColor: colors.dark,
+    borderRadius: SPACING,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  iconText: {
+    color: colors["white-smoke"],
+    fontSize: SPACING,
+  },
+  roastTypeWrapper: {
+    backgroundColor: colors.dark,
+    padding: SPACING / 2,
+    borderRadius: SPACING / 2,
     alignItems: "center",
     justifyContent: "center",
   },
-  image: {
-    width: 200,
-    height: 200,
-    marginBottom: 20,
+  roastTypeText: {
+    color: colors["white-smoke"],
+    fontSize: SPACING * 1.3,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 10,
+  detailsContainer: {
+    padding: SPACING,
   },
-  price: {
-    fontSize: 18,
-    marginBottom: 10,
+  sectionTitle: {
+    color: colors["dark-brown"],
+    fontSize: SPACING * 1.7,
+    marginBottom: SPACING,
   },
   description: {
-    fontSize: 16,
-    marginBottom: 10,
+    color: colors.black,
   },
-  ingredients: {
-    fontSize: 16,
-    marginBottom: 10,
+  recommendationCard: {
+    marginRight: SPACING,
   },
-  rating: {
-    fontSize: 16,
+  recommendationImage: {
+    width: width / 2,
+    height: width / 2,
+    justifyContent: "flex-end",
+  },
+  recommendationImageStyle: {
+    borderRadius: SPACING,
+  },
+  recommendationBlur: {
+    padding: SPACING,
+    borderBottomLeftRadius: SPACING,
+    borderBottomRightRadius: SPACING,
+  },
+  recommendationText: {
+    color: colors.white,
+    fontSize: SPACING * 1.7,
+    fontWeight: "600",
+  },
+  footer: {
+    paddingHorizontal: SPACING,
+    marginBottom: SPACING * 2,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  priceContainer: {
+    padding: SPACING,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingLeft: SPACING * 3,
+  },
+  priceLabel: {
+    color: colors.black,
+    fontSize: SPACING * 1.5,
+  },
+  priceValueContainer: {
+    flexDirection: "row",
+  },
+  priceCurrency: {
+    color: colors.primary,
+    fontSize: SPACING * 2,
+  },
+  priceValue: {
+    color: colors.white,
+    fontSize: SPACING * 2,
+    marginLeft: SPACING / 2,
   },
   buyNowButton: {
-    backgroundColor: "green",
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 20,
+    marginRight: SPACING,
+    backgroundColor: colors.green,
+    width: width / 2 + SPACING * 3,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: SPACING * 2,
   },
-  buyNowText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
+  buyNowButtonText: {
+    color: colors.white,
+    fontSize: SPACING * 2,
+    padding: SPACING * 1.5,
+    fontWeight: "700",
   },
 });
 
