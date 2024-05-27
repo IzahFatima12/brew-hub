@@ -17,23 +17,23 @@ import Categories from "../components/Categories";
 import { useNavigation } from '@react-navigation/native';
 import avatarimage from "../assets/avatar.jpg";
 import banner from "../assets/images/Banner.png";
-import { database } from "../config/firebase";  // Correct import path
-import { ref, onValue, orderByChild,equalTo } from "firebase/database";
+import { database } from "../config/firebase";
+import { ref, onValue, query, orderByChild, equalTo } from "firebase/database";
 import cappuccinoimg from '../assets/images/cappuccino.jpg';
+import categories from "../config/categories"; // Import categories
 
 const avatar = avatarimage;
 const { width } = Dimensions.get("window");
 
 const HomeScreen = () => {
   const navigation = useNavigation();
-
   const [activeCategoryId, setActiveCategoryId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [categories, setCategories] = useState([]);
- const [coffees, setCoffees] = useState([]);
+  const [coffees, setCoffees] = useState([]);
 
-  const handleCategoryChange = (category) => {
-    setActiveCategoryId(category);
+  const handleCategoryChange = (categoryId) => {
+    setActiveCategoryId(categoryId);
+    console.log("Category changed to:", categoryId); // Debug log
   };
 
   useEffect(() => {
@@ -41,45 +41,35 @@ const HomeScreen = () => {
     let queryRef;
 
     if (activeCategoryId) {
-      // Construct the query to fetch data for the selected category
-      queryRef = orderByChild(ref(dbRefCoffees, "category")).equalTo(activeCategoryId);
+      queryRef = query(dbRefCoffees, orderByChild("categoryId"), equalTo(activeCategoryId));
     } else {
       queryRef = dbRefCoffees;
     }
-  
-    
-  
+
     const unsubscribeCoffees = onValue(queryRef, (snapshot) => {
-      const data = snapshot.val(); 
+      const data = snapshot.val();
       if (data) {
         const coffeesArray = Object.keys(data).map((key) => ({
-          id: key, // Assuming 'key' is the unique identifier for each coffee
-          img: data[key].img,
-          title: data[key].title,
-          ingredients: data[key].ingredients,
-          price: data[key].price,
-          rating: data[key].rating,
+          id: key,
+          ...data[key],
         }));
         setCoffees(coffeesArray);
-        console.log("Fetched coffees",coffeesArray);
+        console.log("Fetched coffees:", coffeesArray); // Debug log
+      } else {
+        setCoffees([]);
+        console.log("No coffees found"); // Debug log
       }
     });
-  
-    // Clean up the subscriptions
+
     return () => {
-    
       unsubscribeCoffees();
     };
-  },[activeCategoryId]);  
-  
+  }, [activeCategoryId]);
+
   const filteredCoffees = coffees.filter((coffee) => {
-    const matchesCategory =
-      activeCategoryId === null || coffee.category === activeCategoryId;
-    const matchesSearch = coffee.title
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
+    const matchesCategory = activeCategoryId === null || coffee.categoryId === activeCategoryId;
+    const matchesSearch = coffee.title.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
-  
   });
 
   return (
@@ -92,9 +82,7 @@ const HomeScreen = () => {
       >
         <View style={{ width }}>
           <View style={styles.topContainer}>
-            <View
-              style={{ flexDirection: "row", justifyContent: "space-between" }}
-            >
+            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
               <TouchableOpacity
                 style={{
                   borderRadius: SPACING,
@@ -184,7 +172,7 @@ const HomeScreen = () => {
                     }
                   >
                     <Image
-                          source={coffee.img ? { uri: coffee.img } : cappuccinoimg}// Ensure the image source is a URI
+                      source={coffee.img ? { uri: coffee.img } : cappuccinoimg} // Ensure the image source is a URI
                       style={{
                         width: "100%",
                         height: "100%",
