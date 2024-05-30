@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import SPACING from "../config/SPACING";
 import colors from "../config/colors";
 import { database } from "../config/firebase";
+import { getStorage } from "firebase/storage";
 import { ref, onValue } from "firebase/database";
 import { BlurView } from "expo-blur";
 
@@ -90,7 +91,6 @@ const CoffeeDetails = ({ route, navigation }) => {
           </View>
         </ImageBackground>
         <View style={styles.detailsContainer}>
-        
           <Text style={styles.sectionTitle}>You may also like</Text>
           <FlatList
             horizontal
@@ -259,32 +259,32 @@ const styles = StyleSheet.create({
   priceLabel: {
     color: colors.black,
     fontSize: SPACING * 1.5,
+    fontWeight: "600",
   },
   priceValueContainer: {
     flexDirection: "row",
+    alignItems: "baseline",
   },
   priceCurrency: {
-    color: colors.primary,
-    fontSize: SPACING * 2,
+    color: colors.black,
+    fontSize: SPACING * 1.5,
   },
   priceValue: {
-    color: colors.white,
-    fontSize: SPACING * 2,
-    marginLeft: SPACING / 2,
+    color: colors.black,
+    fontSize: SPACING * 2.5,
+    fontWeight: "600",
   },
   buyNowButton: {
-    marginRight: SPACING,
-    backgroundColor: colors.green,
-    width: width / 2 + SPACING * 3,
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: colors.primary,
+    padding: SPACING * 1.5,
     borderRadius: SPACING * 2,
+    alignItems: "center",
+    justifyContent: "center",
   },
   buyNowButtonText: {
     color: colors.white,
-    fontSize: SPACING * 2,
-    padding: SPACING * 1.5,
-    fontWeight: "700",
+    fontSize: SPACING * 1.7,
+    fontWeight: "600",
   },
 });
 

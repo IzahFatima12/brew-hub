@@ -1,11 +1,76 @@
+// LoginScreen.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ScrollView, ImageBackground } from 'react-native';
-import { initializeApp } from 'firebase/app';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'firebase/auth';
-import { app } from '../config/firebase';
-import bg from "../assets/images/cart.jpg"; // Import your background image
+import { View, Text, TextInput, Button, StyleSheet, ImageBackground, Image, Alert } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage } from '../config/firebase'; // Ensure correct import path
+import bg from '../assets/images/cart.jpg';
+import { getAuth, signInAnonymously } from 'firebase/auth';
+import { useNavigation } from '@react-navigation/native';
 
-const LoginScreen = ({ email, setEmail, password, setPassword, isLogin, setIsLogin, handleAuthentication }) => {
+const LoginScreen = ({ email, setEmail, password, setPassword, isLogin, setIsLogin, handleAuthentication, imageUri, setImageUri }) => {
+  const navigation = useNavigation();
+  const [hasPermission, setHasPermission] = useState(null);
+
+  const auth = getAuth();
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      setHasPermission(status === 'granted');
+    })();
+
+    // Sign in anonymously for this example
+    signInAnonymously(auth).catch((error) => {
+      console.error("Error signing in anonymously: ", error);
+    });
+  }, []);
+
+  const pickImage = async () => {
+    if (hasPermission === null) {
+      Alert.alert('Permission', 'Requesting permissions...');
+      return;
+    }
+    if (hasPermission === false) {
+      Alert.alert('Permission', 'Permission to access media library is required!');
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    console.log("ImagePicker result:", result);
+
+    if (!result.canceled) {
+      try {
+        const response = await fetch(result.assets[0].uri);
+        const blob = await response.blob();
+
+        // Generate a unique filename for the image
+        const imageName = `${Date.now()}-${result.assets[0].fileName}`;
+
+        // Create a reference to the Firebase Storage location
+        const storageRef = ref(storage, `profilePictures/${imageName}`);
+
+        // Upload the image to Firebase Storage
+        const snapshot = await uploadBytes(storageRef, blob);
+
+        // Get the download URL of the uploaded image
+        const downloadURL = await getDownloadURL(snapshot.ref);
+
+        // Set the image URI state with the download URL
+        setImageUri(downloadURL);
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        Alert.alert('Upload Error', 'There was an error uploading the image. Please try again.');
+      }
+    }
+  };
+  
+
   return (
     <ImageBackground source={bg} style={styles.backgroundImage}>
       <View style={styles.authContainer}>
@@ -24,6 +89,12 @@ const LoginScreen = ({ email, setEmail, password, setPassword, isLogin, setIsLog
           placeholder="Password"
           secureTextEntry
         />
+        {!isLogin && (
+          <>
+            <Button title="Pick an image from camera roll" onPress={pickImage} color="#3498db" />
+            {imageUri && <Image source={{ uri: imageUri }} style={styles.imagePreview} />}
+          </>
+        )}
         <View style={styles.buttonContainer}>
           <Button title={isLogin ? 'Sign In' : 'Sign Up'} onPress={handleAuthentication} color="#3498db" />
         </View>
@@ -37,130 +108,50 @@ const LoginScreen = ({ email, setEmail, password, setPassword, isLogin, setIsLog
   );
 };
 
-const AuthenticatedScreen = ({ user, handleAuthentication, navigation }) => {
-  return (
-    <ImageBackground source={bg} style={styles.backgroundImage}>
-      <View style={styles.authContainer}>
-        <Text style={styles.title}>Welcome</Text>
-        <Text style={styles.emailText}>{user.email}</Text>
-        <Button title="Logout" onPress={handleAuthentication} color="#e74c3c" />
-        <Button title="Continue" onPress={() => navigation.navigate('Home')} color="#3498db" />
-      </View>
-    </ImageBackground>
-  );
-};
-
-const App = ({ navigation }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [user, setUser] = useState(null); // Track user authentication state
-  const [isLogin, setIsLogin] = useState(true);
-
-  const auth = getAuth(app);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-    });
-
-    return () => unsubscribe();
-  }, [auth]);
-
-  const handleAuthentication = async () => {
-    try {
-      if (user) {
-        // If user is already authenticated, log out
-        console.log('User logged out successfully!');
-        await signOut(auth);
-      } else {
-        // Sign in or sign up
-        if (isLogin) {
-          // Sign in
-          await signInWithEmailAndPassword(auth, email, password);
-          console.log('User signed in successfully!');
-          navigation.navigate('Home'); // Navigate to Home after sign in
-        } else {
-          // Sign up
-          await createUserWithEmailAndPassword(auth, email, password);
-          console.log('User created successfully!');
-          navigation.navigate('Home'); // Navigate to Home after sign up
-        }
-      }
-    } catch (error) {
-      console.error('Authentication error:', error.message);
-    }
-  };
-
-  return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {user ? (
-        // Show user's email if user is authenticated
-        <AuthenticatedScreen user={user} handleAuthentication={handleAuthentication} navigation={navigation} />
-      ) : (
-        // Show sign-in or sign-up form if user is not authenticated
-        <LoginScreen
-          email={email}
-          setEmail={setEmail}
-          password={password}
-          setPassword={setPassword}
-          isLogin={isLogin}
-          setIsLogin={setIsLogin}
-          handleAuthentication={handleAuthentication}
-        />
-      )}
-    </ScrollView>
-  );
-};
-
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Adjusted for better contrast
-  },
-  backgroundImage: {
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center', // Center the content vertically
   },
   authContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    padding: 20,
+    borderRadius: 10,
     width: '80%',
-    maxWidth: 400,
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 8,
-    elevation: 3,
+    alignItems: 'center',
   },
   title: {
     fontSize: 24,
-    marginBottom: 16,
-    textAlign: 'center',
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
   input: {
+    width: '100%',
     height: 40,
-    borderColor: '#ddd',
+    borderColor: 'gray',
     borderWidth: 1,
-    marginBottom: 16,
-    padding: 8,
-    borderRadius: 4,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+  },
+  imagePreview: {
+    width: 200,
+    height: 200,
+    marginVertical: 20,
   },
   buttonContainer: {
-    marginBottom: 16,
-  },
-  toggleText: {
-    color: '#3498db',
-    textAlign: 'center',
+    width: '100%',
+    marginTop: 10,
   },
   bottomContainer: {
     marginTop: 20,
   },
-  emailText: {
-    fontSize: 18,
-    textAlign: 'center',
-    marginBottom: 20,
+  toggleText: {
+    color: '#3498db',
+    textDecorationLine: 'underline',
   },
 });
 
-export default App;
+export default LoginScreen;

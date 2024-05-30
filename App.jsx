@@ -1,22 +1,18 @@
-
-
-import * as React from 'react';
-import { useEffect,useState } from 'react';
-//import { View, Text } from 'react-native';
+// App.js
+import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NativeBaseProvider } from 'native-base';
-import HomeScreen from './screens/HomeScreen';
-import WelcomeScreen from './screens/WelcomeScreen'
-//import { AppRegistry } from 'react-native';
-import CoffeeDetailsScreen from './screens/CoffeeDetails';
 import * as Font from 'expo-font';
-import  * as SplashScreen from 'expo-splash-screen';
+import * as SplashScreen from 'expo-splash-screen';
+import HomeScreen from './screens/HomeScreen';
+import WelcomeScreen from './screens/WelcomeScreen';
+import CoffeeDetailsScreen from './screens/CoffeeDetails';
 import MyCartScreen from './screens/MyCartScreen';
 import PaymentScreen from './screens/paymentScreen';
-import CR from './assets/fonts/CedarvilleCursive-Regular.ttf';
 import LoginScreen from './screens/LoginScreen';
-
+import CR from './assets/fonts/CedarvilleCursive-Regular.ttf';
+import { getAuth, signInAnonymously } from 'firebase/auth';
 
 SplashScreen.preventAutoHideAsync();
 const loadFonts = () => {
@@ -25,11 +21,18 @@ const loadFonts = () => {
   });
 };
 
-
 const Stack = createNativeStackNavigator();
 
 function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLogin, setIsLogin] = useState(true);
+  const [imageUri, setImageUri] = useState(null);
+
+  const handleAuthentication = () => {
+    // Handle authentication logic here
+  };
 
   useEffect(() => {
     const prepare = async () => {
@@ -50,38 +53,34 @@ function App() {
     // Returning null while fonts are loading prevents the main UI from rendering
     return null;
   }
+
   return (
     <NativeBaseProvider>
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName='Welcome'>
-      <Stack.Screen name="payment" component={PaymentScreen} options={{
-          headerShown: false,
-
-        }}/>
-
-<Stack.Screen name="Login" component={LoginScreen} options={{
-          headerShown: false,
-
-        }}/>
-      <Stack.Screen name="MyCart" component={MyCartScreen} options={{
-          headerShown: false,
-
-        }}/>
-      <Stack.Screen name="CoffeeDetails" component={CoffeeDetailsScreen} options={{
-          headerShown: false,
-
-        }}/>
-        <Stack.Screen name="Home" component={HomeScreen} options={{
-          headerShown: false,
-         }} />
-         
-         <Stack.Screen name="Welcome" component={WelcomeScreen} options={{
-          headerShown: false,
-         }} />
-       
-        
-      </Stack.Navigator>
-    </NavigationContainer>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName='Welcome'>
+          <Stack.Screen name="payment" component={PaymentScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="Login" options={{ headerShown: false }}>
+            {props => (
+              <LoginScreen
+                {...props}
+                email={email}
+                setEmail={setEmail}
+                password={password}
+                setPassword={setPassword}
+                isLogin={isLogin}
+                setIsLogin={setIsLogin}
+                handleAuthentication={handleAuthentication}
+                imageUri={imageUri}
+                setImageUri={setImageUri}
+              />
+            )}
+          </Stack.Screen>
+          <Stack.Screen name="MyCart" component={MyCartScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="CoffeeDetails" component={CoffeeDetailsScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
+        </Stack.Navigator>
+      </NavigationContainer>
     </NativeBaseProvider>
   );
 }

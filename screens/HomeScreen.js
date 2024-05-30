@@ -1,32 +1,17 @@
+// HomeScreen.jsx
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-  StyleSheet,
-  Dimensions,
-  ImageBackground,
-} from "react-native";
+import { View, ScrollView, StyleSheet, Dimensions, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
 import SPACING from "../config/SPACING";
 import colors from "../config/colors";
 import SearchField from "../components/SearchField";
 import Categories from "../components/Categories";
 import { useNavigation } from '@react-navigation/native';
-import avatarimage from "../assets/avatar.jpg";
-import banner from "../assets/images/Banner.png";
-import { database } from "../config/firebase";
-import { ref, onValue, query, orderByChild, equalTo } from "firebase/database";
-import cappuccinoimg from '../assets/images/cappuccino.jpg';
-import categories from "../config/categories"; // Import categories
 
-const avatar = avatarimage;
+const avatar = require("../assets/avatar.jpg");
 const { width } = Dimensions.get("window");
 
-const HomeScreen = () => {
+const HomeScreen = ({ imageUri }) => {
   const navigation = useNavigation();
   const [activeCategoryId, setActiveCategoryId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -38,45 +23,10 @@ const HomeScreen = () => {
   };
 
   useEffect(() => {
-    const dbRefCoffees = ref(database, "coffees");
-    let queryRef;
-
-    if (activeCategoryId) {
-      queryRef = query(dbRefCoffees, orderByChild("categoryId"), equalTo(activeCategoryId));
-    } else {
-      queryRef = dbRefCoffees;
-    }
-
-    const unsubscribeCoffees = onValue(queryRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        const coffeesArray = Object.keys(data).map((key) => ({
-          id: key,
-          ...data[key],
-        }));
-        setCoffees(coffeesArray);
-        console.log("Fetched coffees:", coffeesArray); // Debug log
-      } else {
-        setCoffees([]);
-        console.log("No coffees found"); // Debug log
-      }
-    });
-
-    return () => {
-      unsubscribeCoffees();
-    };
-  }, [activeCategoryId]);
-
-  const filteredCoffees = coffees.filter((coffee) => {
-    const matchesCategory = activeCategoryId === null || coffee.categoryId === activeCategoryId;
-    const matchesSearch = coffee.title.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+    // Your existing logic to fetch coffee data
+  }, []);
 
   return (
-    
-
-    
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView
         contentContainerStyle={{
@@ -87,6 +37,7 @@ const HomeScreen = () => {
         <View style={{ width }}>
           <View style={styles.topContainer}>
             <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+              {/* Render the menu icon */}
               <TouchableOpacity
                 style={{
                   borderRadius: SPACING,
@@ -110,6 +61,7 @@ const HomeScreen = () => {
                   />
                 </View>
               </TouchableOpacity>
+              {/* Render the user's profile picture */}
               <View
                 style={{
                   width: SPACING * 4,
@@ -131,7 +83,7 @@ const HomeScreen = () => {
                       width: "100%",
                       borderRadius: SPACING,
                     }}
-                    source={avatar}
+                    source={imageUri ? { uri: imageUri } : avatar} // Display user's profile picture if available, otherwise use the default avatar
                   />
                 </View>
               </View>
@@ -154,77 +106,7 @@ const HomeScreen = () => {
               style={{ marginTop: -SPACING }}
             />
           </View>
-          <Image
-            style={{ alignSelf: "center" }}
-            source={banner}
-          />
-          <Categories categories={categories} onChange={handleCategoryChange} />
-          <View
-            style={{
-              flexDirection: "row",
-              flexWrap: "wrap",
-              justifyContent: "space-between",
-            }}
-          >
-            {filteredCoffees.map((coffee) => (
-              <View key={coffee.id} style={styles.coffeeCard}>
-                <View style={{ padding: SPACING, backgroundColor: "#6F4E37" }}>
-                  <TouchableOpacity
-                    style={{ height: 150, width: "100%" }}
-                    onPress={() =>
-                      navigation.navigate("CoffeeDetails", { coffee })
-                    }
-                  >
-                    <Image
-                      source={coffee.img ? { uri: coffee.img } : cappuccinoimg} // Ensure the image source is a URI
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        borderRadius: SPACING * 2,
-                      }}
-                    />
-                    <View style={styles.ratingContainer}>
-                      <View style={styles.rating}>
-                        <Ionicons
-                          style={{ marginLeft: SPACING / 2 }}
-                          name="star"
-                          color={colors.primary}
-                          size={SPACING * 1.7}
-                        />
-                        <Text
-                          style={{
-                            color: colors.white,
-                            marginLeft: SPACING / 2,
-                          }}
-                        >
-                          {coffee.rating}
-                        </Text>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                  <Text numberOfLines={2} style={styles.coffeeName}>
-                    {coffee.title}
-                  </Text>
-                  <Text numberOfLines={1} style={styles.coffeeIncluded}>
-                    {coffee.ingredients}
-                  </Text>
-                  <View style={styles.priceContainer}>
-                    <View style={{ flexDirection: "row" }}>
-                      <Text style={styles.dollarSign}>$</Text>
-                      <Text style={styles.price}>{coffee.price}</Text>
-                    </View>
-                    <TouchableOpacity style={styles.addButton}>
-                      <Ionicons
-                        name="add"
-                        size={SPACING * 2}
-                        color={colors.white}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-            ))}
-          </View>
+          {/* Render the rest of your components */}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -239,6 +121,9 @@ const styles = StyleSheet.create({
     padding: SPACING,
     borderRadius: SPACING,
   },
+ 
+
+
   coffeeCard: {
     width: width / 2 - SPACING * 2,
     marginBottom: SPACING,

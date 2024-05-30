@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
 import { getAuth } from 'firebase/auth';
+import { getStorage } from 'firebase/storage';
 
 //import { getAnalytics } from "firebase/analytics";
 // TODO: Add SDKs for Firebase products that you want to use
@@ -14,7 +15,7 @@ const firebaseConfig = {
   authDomain: "brewhub-a1f6d.firebaseapp.com",
   projectId: "brewhub-a1f6d",
   storageBucket: "brewhub-a1f6d.appspot.com",
-  messagingSenderId: "58128023361",
+ messagingSenderId: "58128023361",
   appId: "1:58128023361:web:1f59b010c7db94d4aa6bc0",
   measurementId: "G-XQKT7TYEY1",
   databaseURL: " https://brewhub-a1f6d-default-rtdb.asia-southeast1.firebasedatabase.app"
@@ -24,9 +25,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const auth = getAuth(app);
+const storage = getStorage(app);
+
+export { app, database, auth, storage };
 
 
-export { app, database,auth };
 
 
 
