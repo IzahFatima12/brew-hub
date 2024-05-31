@@ -111,7 +111,7 @@ const LoginScreen = ({isLogin, setIsLogin, cation, imageUri, setImageUri }) => {
         />
         {!isLogin && (
           <>
-            <Button title="Pick an image from camera roll" onPress={pickImage} color="#3498db" />
+            <Button title="Pick an image from camera roll" onPress={pickImage} color="#6F4E37" />
             {loading ? (
               <ActivityIndicator size="large" color="#3498db" style={styles.loader} />
             ) : (
