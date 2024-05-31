@@ -87,7 +87,7 @@ const LoginScreen = ({isLogin, setIsLogin, cation, imageUri, setImageUri }) => {
   return (
     <ImageBackground source={bg} style={styles.backgroundImage}>
       <View style={styles.authContainer}>
-      <Image source={require('../assets/images/login.jpg')} style={styles.logo} /> 
+        
         <Text style={styles.title}>{isLogin ? 'Sign In' : 'Sign Up'}</Text>
         <TextInput
           style={styles.input}
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   authContainer: {
-    backgroundColor: 'rgb(196, 164, 132)',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     padding: 20,
     borderRadius: 10,
     width: '80%',
