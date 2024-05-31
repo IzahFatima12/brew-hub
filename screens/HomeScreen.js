@@ -14,45 +14,48 @@ import SPACING from "../config/SPACING";
 import colors from "../config/colors";
 import SearchField from "../components/SearchField";
 import Categories from "../components/Categories";
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from "@react-navigation/native";
 import avatarimage from "../assets/avatar.jpg";
 import banner from "../assets/images/Banner.png";
-import { database } from "../config/firebase";  // Correct import path
-import { ref, onValue, orderByChild,equalTo } from "firebase/database";
-import cappuccinoimg from '../assets/images/cappuccino.jpg';
+import { database } from "../config/firebase"; // Correct import path
+import { ref, onValue, orderByChild, equalTo } from "firebase/database";
+import cappuccinoimg from "../assets/images/cappuccino.jpg";
 
-const avatar = avatarimage;
+
 const { width } = Dimensions.get("window");
 
 const HomeScreen = () => {
-
   const navigation = useNavigation();
+  const  route  = useRoute();
+  const { imageUri } = route.params;
 
   const [activeCategoryId, setActiveCategoryId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredCoffees, setFilteredCoffees] = useState([]);
+  const [isImageExpanded, setIsImageExpanded] = useState(false);
   // const [categories, setCategories] = useState([]);
- const [coffees, setCoffees] = useState([]);
+  const [coffees, setCoffees] = useState([]);
 
   const handleCategoryChange = (category) => {
     setActiveCategoryId(category);
   };
 
   useEffect(() => {
-
     console.log(activeCategoryId);
     const dbRefCoffees = ref(database, "coffees");
     let queryRef;
 
     if (activeCategoryId) {
       // Construct the query to fetch data for the selected category
-      queryRef = orderByChild(ref(dbRefCoffees, "category")).equalTo(activeCategoryId);
+      queryRef = orderByChild(ref(dbRefCoffees, "category")).equalTo(
+        activeCategoryId
+      );
     } else {
       queryRef = dbRefCoffees;
-    }    
-  
+    }
+
     const unsubscribeCoffees = onValue(queryRef, (snapshot) => {
-      const data = snapshot.val(); 
+      const data = snapshot.val();
       if (data) {
         const coffeesArray = Object.keys(data).map((key) => ({
           id: key, // Assuming 'key' is the unique identifier for each coffee
@@ -61,23 +64,21 @@ const HomeScreen = () => {
           ingredients: data[key].ingredients,
           price: data[key].price,
           rating: data[key].rating,
-          categoryId:data[key].categoryId,
+          categoryId: data[key].categoryId,
         }));
         setCoffees(coffeesArray);
-        console.log("Fetched coffees",coffeesArray);
+        console.log("Fetched coffees", coffeesArray);
       }
     });
-  
+
     // Clean up the subscriptions
     return () => {
-    
       unsubscribeCoffees();
     };
-  },[]);  
+  }, []);
 
-  
   const handleSearchCoffee = () => {
-    const filteredCoffees = coffees.filter(coffee =>
+    const filteredCoffees = coffees.filter((coffee) =>
       coffee.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredCoffees(filteredCoffees);
@@ -87,11 +88,22 @@ const HomeScreen = () => {
     handleSearchCoffee();
   }, [searchQuery]);
 
-  useEffect(()=>{
-    console.log("coffees",coffees);
-    setFilteredCoffees(coffees.filter(coffee => coffee.categoryId === activeCategoryId));
-    console.log("filteredCoffeesonCategory",filteredCoffees);
-  },[activeCategoryId])
+  useEffect(() => {
+    console.log("coffees", coffees);
+    setFilteredCoffees(
+      coffees.filter((coffee) => coffee.categoryId === activeCategoryId)
+    );
+    console.log("filteredCoffeesonCategory", filteredCoffees);
+  }, [activeCategoryId]);
+
+  const toggleImageSize = () => {
+    setIsImageExpanded((prev) => !prev);
+  };
+
+  const handleLogout = () => {
+    navigation.navigate("Login");
+  };
+
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -129,13 +141,14 @@ const HomeScreen = () => {
                   />
                 </View>
               </TouchableOpacity>
-              <View
+              <TouchableOpacity
                 style={{
                   width: SPACING * 4,
                   height: SPACING * 4,
                   overflow: "hidden",
                   borderRadius: SPACING,
                 }}
+                onPress={toggleImageSize}
               >
                 <View
                   style={{
@@ -144,17 +157,29 @@ const HomeScreen = () => {
                     backgroundColor: "rgba(255, 255, 255, 0.6)",
                   }}
                 >
-                  <Image
-                    style={{
-                      height: "100%",
-                      width: "100%",
-                      borderRadius: SPACING,
-                    }}
-                    source={avatar}
-                  />
+                  {imageUri && (
+                    <Image
+                      source={{ uri: imageUri }}
+                      style={{ width: "100%", height: "100%" }}
+                    />
+                  )}
                 </View>
-              </View>
+              </TouchableOpacity>
             </View>
+            {isImageExpanded && (
+  <View style={styles.enlargedImageContainer}>
+    <View style={styles.enlargedImage}>
+      <Image
+        source={{ uri: imageUri }}
+        style={styles.enlargedImage}
+        resizeMode="cover"
+      />
+    </View>
+    <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+      <Text style={styles.logoutButtonText}>Logout</Text>
+    </TouchableOpacity>
+  </View>
+)}
             <View style={{ width: "80%", marginVertical: SPACING * 2 }}>
               <Text
                 style={{
@@ -173,11 +198,8 @@ const HomeScreen = () => {
               style={{ marginTop: -SPACING }}
             />
           </View>
-          <Image
-            style={{ alignSelf: "center" }}
-            source={banner}
-          />
-          <Categories  setActiveCategoryId = {setActiveCategoryId} />
+          <Image style={{ alignSelf: "center" }} source={banner} />
+          <Categories setActiveCategoryId={setActiveCategoryId} />
           <View
             style={{
               flexDirection: "row",
@@ -195,7 +217,7 @@ const HomeScreen = () => {
                     }
                   >
                     <Image
-                          source={coffee.img ? { uri: coffee.img } : cappuccinoimg}// Ensure the image source is a URI
+                      source={coffee.img ? { uri: coffee.img } : cappuccinoimg} // Ensure the image source is a URI
                       style={{
                         width: "100%",
                         height: "100%",
@@ -306,5 +328,41 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     padding: SPACING / 2,
     borderRadius: SPACING,
+
+
   },
+  enlargedImageContainer: {
+    alignItems: "center",
+    marginTop: SPACING * 2,
+    borderRadius: SPACING,
+    backgroundColor: "white",
+    elevation: 3,
+  },
+  enlargedImage: {
+    width: width * 0.6, // Adjust the width to your preference
+    height: width * 0.6, // Adjust the height to your preference
+    borderRadius: SPACING,
+    overflow: "hidden",
+  },
+  logoutButton: {
+    marginTop: SPACING,
+    paddingVertical: SPACING / 2,
+    paddingHorizontal: SPACING * 2,
+    backgroundColor: colors.primary,
+    borderRadius: SPACING,
+  },
+  logoutButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+
+
+
+
+
+
+
+
+
 });

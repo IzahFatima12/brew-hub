@@ -1,4 +1,3 @@
-// LoginScreen.js
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ImageBackground, Image, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
@@ -19,12 +18,12 @@ const LoginScreen = ({isLogin, setIsLogin, cation, imageUri, setImageUri }) => {
       const user = userCredential.user;
       console.log('User created:', user);
     });
-    navigation.navigate('Home');
+    navigation.navigate('Home', { imageUri } );
   };
 
   const handleLogin = async(email, password) => {
     await signInWithEmailAndPassword(getAuth(), email, password);
-    navigation.navigate('Home');
+    navigation.navigate('Home', { imageUri } );
   }
 
 
