@@ -121,9 +121,9 @@ const LoginScreen = ({isLogin, setIsLogin, cation, imageUri, setImageUri }) => {
         )}
         <View style={styles.buttonContainer}>
           {isLogin ? (
-            <Button title="Sign In" onPress={() => handleLogin(email, password)} color="#3498db" />
+            <Button title="Sign In" onPress={() => handleLogin(email, password)} color="#6F4E37" />
           ) : (
-            <Button title="Sign up" onPress={() => handleSignup(email, password)} color="#3498db" />
+            <Button title="Sign up" onPress={() => handleSignup(email, password)} color="#6F4E37" />
           )}
         </View>
         <View style={styles.bottomContainer}>
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   toggleText: {
-    color: '#3498db',
+    color: '#6F4E37',
     textDecorationLine: 'underline',
   },
 });
