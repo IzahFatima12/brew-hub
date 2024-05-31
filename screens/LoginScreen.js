@@ -3,7 +3,7 @@ import { View, Text, TextInput, Button, StyleSheet, ImageBackground, Image, Aler
 import * as ImagePicker from 'expo-image-picker';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '../config/firebase'; // Ensure correct import path
-import bg from '../assets/images/cart.jpg';
+import bg from '../assets/images/login.jpg';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 
@@ -87,6 +87,7 @@ const LoginScreen = ({isLogin, setIsLogin, cation, imageUri, setImageUri }) => {
   return (
     <ImageBackground source={bg} style={styles.backgroundImage}>
       <View style={styles.authContainer}>
+      <Image source={require('../assets/images/login.jpg')} style={styles.logo} /> 
         <Text style={styles.title}>{isLogin ? 'Sign In' : 'Sign Up'}</Text>
         <TextInput
           style={styles.input}
@@ -129,10 +130,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   authContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: 'rgb(196, 164, 132)',
     padding: 20,
     borderRadius: 10,
     width: '80%',
+   
     alignItems: 'center',
   },
   title: {

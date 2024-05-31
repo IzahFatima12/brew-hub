@@ -15,7 +15,7 @@ import colors from "../config/colors";
 import SearchField from "../components/SearchField";
 import Categories from "../components/Categories";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import avatarimage from "../assets/avatar.jpg";
+
 import banner from "../assets/images/Banner.png";
 import { database } from "../config/firebase"; // Correct import path
 import { ref, onValue, orderByChild, equalTo } from "firebase/database";
