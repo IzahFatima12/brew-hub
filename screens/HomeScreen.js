@@ -90,12 +90,13 @@ const HomeScreen = () => {
 
   useEffect(() => {
     console.log("coffees", coffees);
-    setFilteredCoffees(
-      coffees.filter((coffee) => coffee.categoryId === activeCategoryId)
-    );
+    if (activeCategoryId) {
+      setFilteredCoffees(coffees.filter(coffee => coffee.categoryId === activeCategoryId));
+    } else {
+      setFilteredCoffees(coffees);
+    }
     console.log("filteredCoffeesonCategory", filteredCoffees);
-  }, [activeCategoryId]);
-
+  }, [activeCategoryId, coffees]);
   const toggleImageSize = () => {
     setIsImageExpanded((prev) => !prev);
   };
