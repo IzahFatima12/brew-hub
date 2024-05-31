@@ -3,7 +3,7 @@ import React from 'react';
 import { View, Text, ImageBackground, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import COLORS from '../config/colors';
-import bgimage from "../assets/images/BG1.jpg";
+import bgimage from "../assets/images/bg2.jpg";
 
 const WelcomeScreen = ({ email, setEmail, password, setPassword, isLogin, setIsLogin, handleAuthentication, imageUri, setImageUri }) => {
   const navigation = useNavigation();
@@ -14,10 +14,10 @@ const WelcomeScreen = ({ email, setEmail, password, setPassword, isLogin, setIsL
         <View style={{ flex: 1 }}></View>
         <View>
           <View style={{ justifyContent: "center", alignItems: "center", flexDirection: 'column', gap: 10, marginBottom: 10 }}>
-            <Text style={{ color: COLORS.Gingerbread, fontSize: 35, fontWeight: "bold", textAlign: "center", fontFamily: 'CedarvilleCursive-Regular' }}>
+            <Text style={{ color: COLORS.white, fontSize: 35, fontWeight: "bold", textAlign: "center", fontFamily: 'CedarvilleCursive-Regular' }}>
               Brewhub: Your cozy coffee hug!
             </Text>
-            <Text style={{ color: COLORS.Gingerbread, fontSize: 18, fontWeight: "bold", textAlign: "center", paddingBottom: 40 }}>
+            <Text style={{ color: COLORS.white, fontSize: 18, fontWeight: "bold", textAlign: "center", paddingBottom: 40 }}>
               Every sip unlocks a new memory.
             </Text>
             <TouchableOpacity onPress={() => {

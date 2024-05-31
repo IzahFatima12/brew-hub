@@ -219,6 +219,7 @@ const styles = StyleSheet.create({
   iconText: {
     color: colors["white-smoke"],
     fontSize: SPACING,
+    
   },
   roastTypeWrapper: {
     backgroundColor: colors.dark,

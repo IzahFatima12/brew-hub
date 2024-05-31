@@ -1,10 +1,9 @@
-// LoginScreen.js
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ImageBackground, Image, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '../config/firebase'; // Ensure correct import path
-import bg from '../assets/images/cart.jpg';
+import bg from '../assets/images/login.jpg';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 
@@ -19,12 +18,12 @@ const LoginScreen = ({isLogin, setIsLogin, cation, imageUri, setImageUri }) => {
       const user = userCredential.user;
       console.log('User created:', user);
     });
-    navigation.navigate('Home');
+    navigation.navigate('Home', { imageUri } );
   };
 
   const handleLogin = async(email, password) => {
     await signInWithEmailAndPassword(getAuth(), email, password);
-    navigation.navigate('Home');
+    navigation.navigate('Home', { imageUri } );
   }
 
 
@@ -88,6 +87,7 @@ const LoginScreen = ({isLogin, setIsLogin, cation, imageUri, setImageUri }) => {
   return (
     <ImageBackground source={bg} style={styles.backgroundImage}>
       <View style={styles.authContainer}>
+        
         <Text style={styles.title}>{isLogin ? 'Sign In' : 'Sign Up'}</Text>
         <TextInput
           style={styles.input}
@@ -134,6 +134,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     width: '80%',
+   
     alignItems: 'center',
   },
   title: {
