@@ -11,6 +11,8 @@ import CoffeeDetailsScreen from './screens/CoffeeDetails';
 import MyCartScreen from './screens/MyCartScreen';
 import PaymentScreen from './screens/paymentScreen';
 import LoginScreen from './screens/LoginScreen';
+import AddressScreen from './screens/AddressScreen';
+import paymentConfirmationScreen from './screens/PaymentConfirmationScreen';
 import CR from './assets/fonts/CedarvilleCursive-Regular.ttf';
 
 SplashScreen.preventAutoHideAsync();
@@ -53,7 +55,7 @@ function App() {
     <NativeBaseProvider>
       <NavigationContainer>
         <Stack.Navigator initialRouteName='Welcome'>
-          <Stack.Screen name="payment" component={PaymentScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="paymentConfirmationScreen" component={paymentConfirmationScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Login" options={{ headerShown: false }}>
             {props => (
               <LoginScreen
@@ -65,11 +67,15 @@ function App() {
               />
             )}
           </Stack.Screen>
+          <Stack.Screen name="payment" component={PaymentScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="AddressScreen" component={AddressScreen} options={{ headerShown: false }} />
           <Stack.Screen name="MyCart" component={MyCartScreen} options={{ headerShown: false }} />
           <Stack.Screen name="CoffeeDetails" component={CoffeeDetailsScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
         </Stack.Navigator>
+
+
       </NavigationContainer>
     </NativeBaseProvider>
   );

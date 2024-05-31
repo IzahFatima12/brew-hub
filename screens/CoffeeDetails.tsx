@@ -16,7 +16,9 @@ import SPACING from "../config/SPACING";
 import colors from "../config/colors";
 import { database } from "../config/firebase";
 import { getStorage } from "firebase/storage";
-import { ref, onValue } from "firebase/database";
+import {  onValue } from "firebase/database";
+import { ref, set } from "firebase/database";
+
 import { BlurView } from "expo-blur";
 
 const { height, width } = Dimensions.get("window");
@@ -41,9 +43,23 @@ const CoffeeDetails = ({ route, navigation }) => {
     });
   }, [coffee.id]);
 
-  const handleBuyNow = () => {
-    navigation.navigate("MyCart");
+  const handleBuyNow = async (item) => {
+    try {
+      // Generate a unique ID for the cart item
+      const uniqueItemId = `uniqueItemId${Date.now()}`;
+  
+      // Add the selected item to the cart with the unique ID
+      const cartItemRef = ref(database, `cartItems/${uniqueItemId}`);
+      await set(cartItemRef, { ...item, quantity: 1 }); // Set quantity as 1 when adding to cart
+  
+      // Navigate to the cart screen
+      navigation.navigate('MyCart', { item }); // Pass the selected item to the cart screen
+    } catch (error) {
+      console.error('Error adding item to cart:', error.message);
+    }
   };
+  
+  
 
   return (
     <SafeAreaView style={styles.container}>
@@ -125,9 +141,12 @@ const CoffeeDetails = ({ route, navigation }) => {
             <Text style={styles.priceValue}>{coffee.price}</Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.buyNowButton} onPress={handleBuyNow}>
-          <Text style={styles.buyNowButtonText}>Buy Now</Text>
-        </TouchableOpacity>
+        <TouchableOpacity style={styles.buyNowButton} onPress={() => handleBuyNow(coffee)}>
+  <Text style={styles.buyNowButtonText}>Buy Now</Text>
+</TouchableOpacity>
+
+
+
       </SafeAreaView>
     </SafeAreaView>
   );

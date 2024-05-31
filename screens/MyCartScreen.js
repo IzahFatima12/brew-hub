@@ -1,135 +1,175 @@
-import React, { useState } from 'react';
-import { FlatList, StyleSheet, Text, View, Image, SafeAreaView, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import PropTypes from 'prop-types';
 import COLORS from '../config/colors';
-import coffees from '../config/coffees';
 import PrimaryButton from '../components/PrimaryButton';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import colors from "../config/colors";
 
 const MyCartScreen = () => {
   const navigation = useNavigation();
-  const [cartItems, setCartItems] = useState(coffees.map(item => ({ ...item, quantity: 1 })));
+  const route = useRoute();
+  const [cartItems, setCartItems] = useState([]);
 
-  const handleIncrement = (id) => {
-    const updatedCartItems = cartItems.map(item =>
-      item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+  useEffect(() => {
+    if (route.params?.item) {
+      const existingItem = cartItems.find((cartItem) => cartItem.id === route.params.item.id);
+      if (!existingItem) {
+        setCartItems((prevCartItems) => [...prevCartItems, { ...route.params.item, quantity: 1 }]);
+      } else {
+        const updatedCartItems = cartItems.map((cartItem) =>
+          cartItem.id === existingItem.id ? { ...cartItem, quantity: cartItem.quantity + 1 } : cartItem
+        );
+        setCartItems(updatedCartItems);
+      }
+    }
+  }, [route.params?.item]);
+
+  const handleIncrement = (item) => {
+    const updatedCartItems = cartItems.map((cartItem) =>
+      cartItem.id === item.id ? { ...cartItem, quantity: cartItem.quantity + 1 } : cartItem
     );
     setCartItems(updatedCartItems);
   };
 
-  
-  const handleDecrement = (id) => {
-    const updatedCartItems = cartItems.map(item =>
-      item.id === id ? { ...item, quantity: item.quantity - 1 } : item
-    ).filter(item => item.quantity > 0); // Remove item if quantity becomes 0
+  const handleDecrement = (item) => {
+    const updatedCartItems = cartItems.map((cartItem) =>
+      cartItem.id === item.id && cartItem.quantity > 1 ? { ...cartItem, quantity: cartItem.quantity - 1 } : cartItem
+    );
     setCartItems(updatedCartItems);
   };
 
-  const handleRemove = (id) => {
-    const updatedCartItems = cartItems.filter(item => item.id !== id);
+  const handleRemove = (item) => {
+    const updatedCartItems = cartItems.filter((cartItem) => cartItem.id !== item.id);
     setCartItems(updatedCartItems);
   };
 
-  const CartCard = ({ item }) => {
-    return (
-      <View style={styles.cartCard}>
-        <Image source={item.image} style={{ height: 80, width: 80 }} />
-        <View style={{ height: 100, marginLeft: 10, paddingVertical: 20, flex: 1 }}>
-          <Text style={{ fontWeight: 'bold', fontSize: 16, color: COLORS.white, paddingBottom: 7 }}>{item.name}</Text>
-          <Text style={{ fontSize: 13, color: COLORS.white, paddingBottom: 5, }}>{item.included}</Text>
-          <Text style={{ fontSize: 17, fontWeight: 'bold', color: COLORS.white }}>${item.price}</Text>
-        </View>
-        <View style={{ marginRight: 20, alignItems: 'center' }}>
-          <Text style={{ fontWeight: 'bold', fontSize: 18, color: COLORS.white, paddingBottom: 13, }}>{item.quantity}</Text>
-          <View style={styles.actionBtn}>
-            <TouchableOpacity onPress={() => handleDecrement(item.id)}>
-              <Icon name="remove" size={25} color={COLORS.Gingerbread} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleIncrement(item.id)}>
-              <Icon name="add" size={25} color={COLORS.Gingerbread} />
-            </TouchableOpacity>
-          </View>
-        </View>
-        <TouchableOpacity onPress={() => handleRemove(item.id)}>
-          <Icon name="delete" size={25} color={COLORS.Gingerbread} />
+  const renderCartItem = ({ item }) => (
+    <View style={styles.cartItem}>
+      <Image source={{ uri: item.img }} style={styles.itemImage} />
+      <Text style={styles.itemTitle}>{item.title}</Text>
+      <Text style={styles.itemPrice}>Price: ${item.price}</Text>
+      <View style={styles.quantityContainer}>
+        <TouchableOpacity onPress={() => handleDecrement(item)}>
+          <Icon name="remove" size={25} color={COLORS.white} />
+        </TouchableOpacity>
+        <Text style={styles.quantityText}>{item.quantity}</Text>
+        <TouchableOpacity onPress={() => handleIncrement(item)}>
+          <Icon name="add" size={25} color={COLORS.white} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleRemove(item)}>
+          <Icon name="delete" size={25} color={COLORS.white} />
         </TouchableOpacity>
       </View>
-    );
-  };
+    </View>
+  );
 
-  CartCard.propTypes = {
-    item: PropTypes.shape({
-      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-      name: PropTypes.string.isRequired,
-      included: PropTypes.string.isRequired,
-      price: PropTypes.string.isRequired,
-      image: PropTypes.oneOfType([PropTypes.object, PropTypes.number]).isRequired,
-    }).isRequired,
-  };
-
-  const totalPrice = cartItems.reduce((acc, item) => acc + (parseFloat(item.price) * item.quantity), 0).toFixed(2);
+  const totalPrice = cartItems.reduce(
+    (acc, item) => acc + (parseFloat(item.price) || 0) * (item.quantity || 0),
+    0
+  );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.brown }}>
-      <View style={styles.header}>
-        <Icon name="arrow-back-ios" size={28} onPress={() => navigation.goBack()} />
-        <Text style={{ fontSize: 20, fontWeight: 'bold', color: COLORS.white, paddingTop: 20, paddingLeft: 90, fontstyle: 'cursive' }}>My Cart</Text>
-      </View>
+    <View style={styles.container}>
       <FlatList
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 80 }}
         data={cartItems}
-        renderItem={({ item }) => <CartCard item={item} />}
-        ListFooterComponentStyle={{ paddingHorizontal: 20, marginTop: 20 }}
-        ListFooterComponent={() => (
-          <View>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: 15 }}>
-              <Text style={{ fontSize: 18, fontWeight: 'bold', color: COLORS.Gingerbread }}>Total Price</Text>
-              <Text style={{ fontSize: 18, fontWeight: 'bold', color: COLORS.Gingerbread }}>${totalPrice}</Text>
-            </View>
-            <View style={{ marginHorizontal: 30 }}>
-              <PrimaryButton title="CHECKOUT" onPress={() => navigation.navigate('payment')} />
-            </View>
-          </View>
-        )}
+        renderItem={renderCartItem}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={{ paddingBottom: 80 }}
       />
-    </SafeAreaView>
+      {cartItems.length === 0 && (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={styles.emptyCartText}>Your cart is empty</Text>
+        </View>
+      )}
+      <TouchableOpacity style={styles.continueShoppingButton} onPress={() => navigation.navigate('Home')}>
+        <Text style={styles.continueShoppingText}>Continue Shopping</Text>
+      </TouchableOpacity>
+      {cartItems.length > 0 && (
+        <View style={styles.footer}>
+          <Text style={styles.totalPriceText}>Total Price: ${totalPrice.toFixed(2)}</Text>
+          <PrimaryButton title="CHECKOUT" onPress={() => navigation.navigate('AddressScreen')} />
+        </View>
+      )}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  header: {
-    paddingVertical: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: 10,
-    backgroundColor: COLORS.Gingerbread,
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.brown,
+    paddingTop: 40,
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingBottom:10,
   },
-  cartCard: {
-    height: 100,
-    elevation: 15,
-    borderRadius: 10,
+  emptyCartText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 20,
+    color:COLORS.Gingerbread,
+  },
+  cartItem: {
+    flexDirection: 'column',
+    alignItems:'center',
+    justifyContent: 'space-between',
     backgroundColor: COLORS.Gingerbread,
-    marginVertical: 10,
-    marginHorizontal: 20,
-    paddingHorizontal: 10,
+    marginVertical: 5,
+    borderRadius: 5,
+    padding:20,
+  },
+  itemImage: {
+    width: 50,
+    height: 50,
+    marginRight: 10,
+  },
+  itemTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 5,
+    color: colors.brown, // Add margin bottom for spacing
+  },
+  itemPrice: {
+    fontSize: 15,
+    padding: 8,
+  },
+  quantityContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+  },
+  quantityText: {
+    marginHorizontal: 10,
+    fontSize: 16,
+    color:colors.brown,
+  },
+  actionButtonsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   button: {
-    backgroundColor: COLORS.Gingerbread,
+    marginHorizontal: 5,
   },
-  actionBtn: {
-    width: 80,
-    height: 30,
-    backgroundColor: COLORS.white,
-    borderRadius: 30,
-    paddingHorizontal: 5,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  footer: {
+    marginTop: 20,
+  },
+  totalPriceText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  continueShoppingButton: {
+    backgroundColor: COLORS.green,
+    padding: 10,
+    borderRadius: 5,
     alignItems: 'center',
+    marginTop: 20,
+  },
+  continueShoppingText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: COLORS.Gingerbread,
   },
 });
 

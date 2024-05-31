@@ -1,31 +1,50 @@
-import React from "react";
-import { Box, Center, ScrollView, Text, VStack, HStack, Spacer, Image } from "native-base";
+import React, { useState } from "react";
+import { Box, Center, ScrollView, Text, VStack, Pressable, Image } from "native-base";
 import COLORS from '../config/colors'; 
 import PrimaryButton from "../components/PrimaryButton"; 
 import { Ionicons } from "@expo/vector-icons";
-import paypalimage from '../assets/images/paypal.jpg';
-import discoverimage from '../assets/images/discover.png';
-import googlePayimage from '../assets/images/googlepay.png';
+import codImage from '../assets/images/cod.png';
+import creditCardImage from '../assets/images/credit-card.png';
+import debitCardImage from '../assets/images/debit-card.png';
+import { Alert } from "react-native";
+import { useNavigation } from '@react-navigation/native';
 
+// Define the paymentMethods array
 const paymentMethods = [
   {
-    image: paypalimage,
-    alt: "paypal",
+    id: "cod",
+    image: codImage,
+    alt: "Cash on Delivery",
     icon: Ionicons,
   },
   {
-    image: discoverimage,
-    alt: "discover",
+    id: "creditCard",
+    image: creditCardImage,
+    alt: "Credit Card",
     icon: Ionicons, 
   },
   {
-    image: googlePayimage,
-    alt: "googlepay",
-    icon: Ionicons, 
+    id: "debitcard",
+    image: debitCardImage,
+    alt: "Debit card",
+    icon: Ionicons,
   },
 ];
 
 function PaymentScreen() {
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+  const navigation = useNavigation(); // Initialize navigation
+
+  const handlePaymentConfirmation = () => {
+    if (!selectedPaymentMethod) {
+      Alert.alert("Please select a payment method.");
+      return;
+    }
+
+    // Here you can add additional logic for payment confirmation
+    navigation.navigate('paymentConfirmationScreen'); // Navigate to PaymentConfirmationScreen
+  };
+
   return (
     <Box flex={1} safeAreaTop bg={COLORS.Gingerbread} py={5}>
       <Center pb={15}>
@@ -36,37 +55,41 @@ function PaymentScreen() {
       <Box h="full" bg={COLORS.brown} px={5}>
         <ScrollView showsVerticalScrollIndicator={false}>
           <VStack space={6} mt={5}>
-            {paymentMethods.map((i, index) => (
-              <HStack
+            {paymentMethods.map((method, index) => (
+              <Pressable
                 key={index}
-                alignItems="center"
-                bg={COLORS.Gingerbread}
-                px={3}
-                py={1}
-                justifyContent="space-between"
-                rounded={10}
+                onPress={() => setSelectedPaymentMethod(method.id)}
+                style={({ pressed }) => ({
+                  backgroundColor: pressed ? COLORS.blue : COLORS.Gingerbread,
+                  padding: 10,
+                  borderRadius: 10,
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                })}
               >
                 <Box>
                   <Image
-                    source={i.image}
-                    alt={i.alt}
+                    source={method.image}
+                    alt={method.alt}
                     resizeMode="contain"
                     w={60}
                     h={50}
+                    style={{}} // Example styles
                   />
-                  <Spacer />
+                  <Text ml={2} color={COLORS.Gingerbread} fontSize={20} bold >{method.alt}</Text> {/* Display payment method title */}
                 </Box>
-                <i.icon
-                  name="checkmark-circle"
-                  size={30}
-                  color={COLORS.Tawny}
-                />
-              </HStack>
+                {selectedPaymentMethod === method.id && (
+                  <Ionicons
+                    name="checkmark-circle"
+                    size={30}
+                    color={COLORS.Tawny}
+                  />
+                )}
+              </Pressable>
             ))}
-            <PrimaryButton title="Continue" style={{ backgroundColor: COLORS.Gingerbread, marginTop: 20 }} />
-            <Text italic textAlign="center" color={COLORS.Gingerbread}>
-              Payment method is<Text bold color={COLORS.Gingerbread}> Paypal</Text> by default
-            </Text>
+            <PrimaryButton title="Continue" onPress={handlePaymentConfirmation} style={{ backgroundColor: COLORS.Gingerbread, marginTop: 20 }} />
+            
           </VStack>
         </ScrollView>
       </Box>
