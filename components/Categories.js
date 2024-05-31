@@ -2,15 +2,16 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import SPACING from "../config/SPACING";
 import colors from "../config/colors";
+import categories from "../config/categories";
 
-const Categories = ({ categories, onChange }) => {
+const Categories = ({ setActiveCategoryId }) => {
   return (
     <View style={styles.container}>
       {categories.map((category) => (
         <TouchableOpacity
           key={category.categoryId}
           style={styles.categoryButton}
-          onPress={() => onChange(category.categoryId)}
+          onPress={() => setActiveCategoryId(category.categoryId)}
         >
           <Text style={styles.categoryText}>{category.name}</Text>
         </TouchableOpacity>

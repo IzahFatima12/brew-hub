@@ -5,14 +5,28 @@ import * as ImagePicker from 'expo-image-picker';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '../config/firebase'; // Ensure correct import path
 import bg from '../assets/images/cart.jpg';
-import { getAuth, signInAnonymously } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 
-const LoginScreen = ({ email, setEmail, password, setPassword, isLogin, setIsLogin, handleAuthentication, imageUri, setImageUri }) => {
+const LoginScreen = ({isLogin, setIsLogin, cation, imageUri, setImageUri }) => {
   const navigation = useNavigation();
   const [hasPermission, setHasPermission] = useState(null);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const auth = getAuth();
+  const handleSignup = async(email, password) => {
+    await createUserWithEmailAndPassword(getAuth(), email, password).then((userCredential) => {
+      const user = userCredential.user;
+      console.log('User created:', user);
+    });
+    navigation.navigate('Home');
+  };
+
+  const handleLogin = async(email, password) => {
+    await signInWithEmailAndPassword(getAuth(), email, password);
+    navigation.navigate('Home');
+  }
+
 
   useEffect(() => {
     (async () => {
@@ -20,10 +34,10 @@ const LoginScreen = ({ email, setEmail, password, setPassword, isLogin, setIsLog
       setHasPermission(status === 'granted');
     })();
 
-    // Sign in anonymously for this example
-    signInAnonymously(auth).catch((error) => {
-      console.error("Error signing in anonymously: ", error);
-    });
+    // // Sign in anonymously for this example
+    // signInAnonymously(auth).catch((error) => {
+    //   console.error("Error signing in anonymously: ", error);
+    // });
   }, []);
 
   const pickImage = async () => {
@@ -96,7 +110,7 @@ const LoginScreen = ({ email, setEmail, password, setPassword, isLogin, setIsLog
           </>
         )}
         <View style={styles.buttonContainer}>
-          <Button title={isLogin ? 'Sign In' : 'Sign Up'} onPress={handleAuthentication} color="#3498db" />
+          {isLogin?<Button title="Sign In" onPress={()=>handleLogin(email, password)} color="#3498db" />:<Button title="Sign up" onPress={()=>handleSignup(email, password)} color="#3498db" />}
         </View>
         <View style={styles.bottomContainer}>
           <Text style={styles.toggleText} onPress={() => setIsLogin(!isLogin)}>

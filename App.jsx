@@ -12,7 +12,6 @@ import MyCartScreen from './screens/MyCartScreen';
 import PaymentScreen from './screens/paymentScreen';
 import LoginScreen from './screens/LoginScreen';
 import CR from './assets/fonts/CedarvilleCursive-Regular.ttf';
-import { getAuth, signInAnonymously } from 'firebase/auth';
 
 SplashScreen.preventAutoHideAsync();
 const loadFonts = () => {
@@ -25,14 +24,10 @@ const Stack = createNativeStackNavigator();
 
 function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
   const [imageUri, setImageUri] = useState(null);
 
-  const handleAuthentication = () => {
-    // Handle authentication logic here
-  };
+  
 
   useEffect(() => {
     const prepare = async () => {
@@ -63,13 +58,8 @@ function App() {
             {props => (
               <LoginScreen
                 {...props}
-                email={email}
-                setEmail={setEmail}
-                password={password}
-                setPassword={setPassword}
                 isLogin={isLogin}
                 setIsLogin={setIsLogin}
-                handleAuthentication={handleAuthentication}
                 imageUri={imageUri}
                 setImageUri={setImageUri}
               />
