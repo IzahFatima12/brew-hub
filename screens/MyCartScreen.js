@@ -82,7 +82,7 @@ const MyCartScreen = () => {
           <Text style={styles.emptyCartText}>Your cart is empty</Text>
         </View>
       )}
-      <TouchableOpacity style={styles.continueShoppingButton} onPress={() => navigation.navigate('Home')}>
+      <TouchableOpacity style={styles.continueShoppingButton} onPress={() => navigation.navigate('Home',)}>
         <Text style={styles.continueShoppingText}>Continue Shopping</Text>
       </TouchableOpacity>
       {cartItems.length > 0 && (

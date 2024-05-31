@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ActivityIndicator } from 'react-native';
 import { View, Text, TextInput, Button, StyleSheet, ImageBackground, Image, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -12,6 +13,7 @@ const LoginScreen = ({isLogin, setIsLogin, cation, imageUri, setImageUri }) => {
   const [hasPermission, setHasPermission] = useState(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSignup = async(email, password) => {
     await createUserWithEmailAndPassword(getAuth(), email, password).then((userCredential) => {
@@ -58,6 +60,7 @@ const LoginScreen = ({isLogin, setIsLogin, cation, imageUri, setImageUri }) => {
     console.log("ImagePicker result:", result);
 
     if (!result.canceled) {
+      setLoading(true); 
       try {
         const response = await fetch(result.assets[0].uri);
         const blob = await response.blob();
@@ -79,6 +82,9 @@ const LoginScreen = ({isLogin, setIsLogin, cation, imageUri, setImageUri }) => {
       } catch (error) {
         console.error('Error uploading image:', error);
         Alert.alert('Upload Error', 'There was an error uploading the image. Please try again.');
+      }
+      finally {
+        setLoading(false);
       }
     }
   };
@@ -106,11 +112,19 @@ const LoginScreen = ({isLogin, setIsLogin, cation, imageUri, setImageUri }) => {
         {!isLogin && (
           <>
             <Button title="Pick an image from camera roll" onPress={pickImage} color="#3498db" />
-            {imageUri && <Image source={{ uri: imageUri }} style={styles.imagePreview} />}
+            {loading ? (
+              <ActivityIndicator size="large" color="#3498db" style={styles.loader} />
+            ) : (
+              imageUri && <Image source={{ uri: imageUri }} style={styles.imagePreview} />
+            )}
           </>
         )}
         <View style={styles.buttonContainer}>
-          {isLogin?<Button title="Sign In" onPress={()=>handleLogin(email, password)} color="#3498db" />:<Button title="Sign up" onPress={()=>handleSignup(email, password)} color="#3498db" />}
+          {isLogin ? (
+            <Button title="Sign In" onPress={() => handleLogin(email, password)} color="#3498db" />
+          ) : (
+            <Button title="Sign up" onPress={() => handleSignup(email, password)} color="#3498db" />
+          )}
         </View>
         <View style={styles.bottomContainer}>
           <Text style={styles.toggleText} onPress={() => setIsLogin(!isLogin)}>
@@ -121,7 +135,6 @@ const LoginScreen = ({isLogin, setIsLogin, cation, imageUri, setImageUri }) => {
     </ImageBackground>
   );
 };
-
 const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
@@ -159,6 +172,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: '100%',
     marginTop: 10,
+     color :"#6F4E37",
   },
   bottomContainer: {
     marginTop: 20,

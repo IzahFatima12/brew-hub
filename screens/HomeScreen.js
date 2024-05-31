@@ -101,7 +101,7 @@ const HomeScreen = () => {
   };
 
   const handleLogout = () => {
-    navigation.navigate("Login");
+    navigation.navigate("Welcome");
   };
 
 
@@ -332,23 +332,29 @@ const styles = StyleSheet.create({
 
   },
   enlargedImageContainer: {
-    alignItems: "center",
+    alignItems: "centre",
     marginTop: SPACING * 2,
     borderRadius: SPACING,
     backgroundColor: "white",
     elevation: 3,
+    padding: SPACING, 
+    alignSelf:"flex-end",
+    width: width * 0.35,
+    backgroundColor:"#f5deb3",
+   
   },
   enlargedImage: {
-    width: width * 0.6, // Adjust the width to your preference
-    height: width * 0.6, // Adjust the height to your preference
+    width: width * 0.3, // Adjust the width to your preference
+    height: width * 0.3, // Adjust the height to your preference
     borderRadius: SPACING,
     overflow: "hidden",
+    alignSelf : "centre"
   },
   logoutButton: {
     marginTop: SPACING,
     paddingVertical: SPACING / 2,
     paddingHorizontal: SPACING * 2,
-    backgroundColor: colors.primary,
+    backgroundColor: "#6F4E37", // Adjust the color to your preference
     borderRadius: SPACING,
   },
   logoutButtonText: {
@@ -356,11 +362,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-
-
-
-
-
 
 
 
