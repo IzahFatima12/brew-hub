@@ -76,7 +76,6 @@ const HomeScreen = () => {
       unsubscribeCoffees();
     };
   }, []);
-
   const handleSearchCoffee = () => {
     const filteredCoffees = coffees.filter((coffee) =>
       coffee.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -199,7 +198,7 @@ const HomeScreen = () => {
               style={{ marginTop: -SPACING }}
             />
           </View>
-          <Image style={{ alignSelf: "center" }} source={banner} />
+        
           <Categories setActiveCategoryId={setActiveCategoryId} />
           <View
             style={{
